@@ -1,4 +1,5 @@
 package shoptest;
+import net.canarymod.api.nbt.CompoundTag;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.logger.Logman;
 import net.canarymod.Canary;
@@ -78,15 +79,15 @@ public class ShopTest extends EZPlugin implements PluginListener {
     Inventory ci = of.newCustomStorageInventory(1);
     ci.setInventoryName("SHOP");
 
-    fillSlot(ci, it, item, 0, 1);
-    fillSlot(ci, it, item, 1, 2);
-    fillSlot(ci, it, item, 2, 4);
-    fillSlot(ci, it, item, 3, 8);
-    fillSlot(ci, it, item, 4, 16);
-    fillSlot(ci, it, item, 5, 24);
-    fillSlot(ci, it, item, 6, 32);
-    fillSlot(ci, it, item, 7, 48);
-    fillSlot(ci, it, item, 8, 64);
+    fillSlot(action, ci, it, item, 0, 1);
+    fillSlot(action, ci, it, item, 1, 2);
+    fillSlot(action, ci, it, item, 2, 4);
+    fillSlot(action, ci, it, item, 3, 8);
+    fillSlot(action, ci, it, item, 4, 16);
+    fillSlot(action, ci, it, item, 5, 24);
+    fillSlot(action, ci, it, item, 6, 32);
+    fillSlot(action, ci, it, item, 7, 48);
+    fillSlot(action, ci, it, item, 8, 64);
 
     me.openInventory(ci);
   }
@@ -104,16 +105,27 @@ public class ShopTest extends EZPlugin implements PluginListener {
     event.setCanceled();
 
     Item i = h.getItem();
+    CompoundTag tag = i.getMetaTag();
+    String shopType = tag.getString("shoptype");
 
     Inventory playerInv = me.getInventory();
 
-    // TODO determine if this shop is buy or sell
-    playerInv.addItem(i.getId(), i.getAmount());
+    if (shopType.equals("BUY")) {
+      playerInv.addItem(i.getId(), i.getAmount());
+    } else {
+      if (playerInv.hasItemStack(i.getId(), i.getAmount())) {
+        playerInv.decreaseItemStackSize(i.getId(), i.getAmount());
+      }
+    }
   }
 
-  private void fillSlot(Inventory inv, ItemType it, String item, int slot, int count) {
+  private void fillSlot(String action, Inventory inv, ItemType it, String item, int slot, int count) {
+
     ItemFactory itemf = Canary.factory().getItemFactory();
     Item i = itemf.newItem(it, 0, count);
+    CompoundTag tag = i.getMetaTag();
+    tag.put("shoptype", action.toUpperCase());
+
     String name = item.toUpperCase();
 
     String lore0 = String.format("Buy %dx %s", count, name);
