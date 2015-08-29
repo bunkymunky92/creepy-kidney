@@ -26,6 +26,16 @@ public class ShopTest extends EZPlugin implements PluginListener {
     Canary.hooks().registerListener(this, this);
     return super.enable();
   }
+
+  @Command(aliases = { "shopnew" },
+      description = "create a new shop",
+      permissions = { "*" },
+      toolTip = "/shopnew")
+  public void shopnewCommand(MessageReceiver caller, String[] parameters) {
+    if (caller instanceof Player) {
+      Player me = (Player)caller;
+    }
+  }
   
   @Command(aliases = { "shoptest" },
             description = "shoptest plugin",
@@ -41,7 +51,7 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
       CanaryObjectFactory of = new CanaryObjectFactory();
       Inventory ci = of.newCustomStorageInventory(1);
-      ci.setInventoryName("WELCOME TO THE SHOP!!!");
+      ci.setInventoryName("SHOP");
       ci.setSlot(2, x);
       me.openInventory(ci);
     }
@@ -54,7 +64,13 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
   @HookHandler
   public void onSlotClick(SlotClickHook event) {
-    Canary.instance().getServer().broadcastMessage("got a slot click event!");
+    SlotClickHook h = (SlotClickHook)event;
+    Inventory inv = h.getInventory();
+
+    if (inv.getInventoryName() != "SHOP") {
+      return;
+    }
+
     event.setCanceled();
   }
 }
