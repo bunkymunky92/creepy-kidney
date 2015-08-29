@@ -93,6 +93,7 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
   @HookHandler
   public void onSlotClick(SlotClickHook event) {
+    Player me = event.getPlayer();
     SlotClickHook h = (SlotClickHook)event;
     Inventory inv = h.getInventory();
 
@@ -101,6 +102,13 @@ public class ShopTest extends EZPlugin implements PluginListener {
     }
 
     event.setCanceled();
+
+    Item i = h.getItem();
+
+    Inventory playerInv = me.getInventory();
+
+    // TODO determine if this shop is buy or sell
+    playerInv.addItem(i.getId(), i.getAmount());
   }
 
   private void fillSlot(Inventory inv, ItemType it, String item, int slot, int count) {
