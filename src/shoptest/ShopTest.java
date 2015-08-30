@@ -1,12 +1,11 @@
 package shoptest;
-import net.canarymod.api.nbt.CompoundTag;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.logger.Logman;
 import net.canarymod.Canary;
 import net.canarymod.commandsys.*;
 import net.canarymod.chat.MessageReceiver;
+import net.canarymod.api.nbt.CompoundTag;
 import net.canarymod.api.entity.living.humanoid.Player;
-import net.canarymod.api.world.World;
 import net.canarymod.api.world.blocks.BlockType;
 import net.canarymod.api.world.blocks.Sign;
 import net.canarymod.api.world.blocks.Block;
