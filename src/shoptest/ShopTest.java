@@ -1,4 +1,6 @@
 package shoptest;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.logger.Logman;
 import net.canarymod.Canary;
@@ -43,12 +45,6 @@ public class ShopTest extends EZPlugin implements PluginListener {
     ChatComponent l0 = s.getComponentOnLine(0);
     String firstLine = l0.getText();
 
-    // Shop sign lines
-    // [Shop]
-    // (Buy|Sell)
-    // Item
-    // $5/ea
-    
     if (!firstLine.equals("[Shop]")) {
       return;
     }
@@ -68,7 +64,14 @@ public class ShopTest extends EZPlugin implements PluginListener {
     }
 
     String price = s.getComponentOnLine(3).getText();
-    // Check price validity
+    String priceStr = price.replaceAll("[^\\d.]+", "");
+    NumberFormat nf = NumberFormat.getInstance();
+    double p;
+    try {
+      p = nf.parse(priceStr).doubleValue();
+    } catch(ParseException e) {
+      return;
+    }
 
 
     // Show shop
@@ -80,17 +83,17 @@ public class ShopTest extends EZPlugin implements PluginListener {
     ci.setInventoryName("SHOP");
 
     if (action.equals("Buy")) {
-      fillSlot(action, ci, it, item, 0, 1);
-      fillSlot(action, ci, it, item, 1, 2);
-      fillSlot(action, ci, it, item, 2, 4);
-      fillSlot(action, ci, it, item, 3, 8);
-      fillSlot(action, ci, it, item, 4, 16);
-      fillSlot(action, ci, it, item, 5, 24);
-      fillSlot(action, ci, it, item, 6, 32);
-      fillSlot(action, ci, it, item, 7, 48);
-      fillSlot(action, ci, it, item, 8, 64);
+      fillSlot(action, p, ci, it, item, 0, 1);
+      fillSlot(action, p, ci, it, item, 1, 2);
+      fillSlot(action, p, ci, it, item, 2, 4);
+      fillSlot(action, p, ci, it, item, 3, 8);
+      fillSlot(action, p, ci, it, item, 4, 16);
+      fillSlot(action, p, ci, it, item, 5, 24);
+      fillSlot(action, p, ci, it, item, 6, 32);
+      fillSlot(action, p, ci, it, item, 7, 48);
+      fillSlot(action, p, ci, it, item, 8, 64);
     } else {
-      fillSlot(action, ci, it, item, 4, 1);
+      fillSlot(action, p, ci, it, item, 4, 1);
     }
 
     me.openInventory(ci);
@@ -129,6 +132,12 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
     Inventory playerInv = me.getInventory();
 
+    if (!itemMeta.containsKey("price")) {
+      return;
+    }
+
+    double price = itemMeta.getDouble("price");
+
     if (shopType.equals("BUY")) {
       if (!itemMeta.containsKey("shoptype")) {
         // Clicked item in own inventory, return
@@ -154,12 +163,13 @@ public class ShopTest extends EZPlugin implements PluginListener {
     // Clicking the top row item buys it.
   }
 
-  private void fillSlot(String action, Inventory inv, ItemType it, String item, int slot, int count) {
+  private void fillSlot(String action, double price, Inventory inv, ItemType it, String item, int slot, int count) {
 
     ItemFactory itemf = Canary.factory().getItemFactory();
     Item i = itemf.newItem(it, 0, count);
     CompoundTag tag = i.getMetaTag();
     tag.put("shoptype", action.toUpperCase());
+    tag.put("price", price);
 
     String name = item.toUpperCase();
 
