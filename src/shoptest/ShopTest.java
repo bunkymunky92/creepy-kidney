@@ -136,6 +136,7 @@ public class ShopTest extends EZPlugin implements PluginListener {
       playerInv.addItem(i.getId(), i.getAmount());
     } else {
       if (playerInv.hasItemStack(i.getId(), i.getAmount())) {
+        // Doesn't work correctly if e.g. sale size is 64 but have 2x 32 stacks
         playerInv.decreaseItemStackSize(i.getId(), i.getAmount());
       } else {
         // Message player that they don't have enough
