@@ -143,6 +143,8 @@ public class ShopTest extends EZPlugin implements PluginListener {
     } else {
       if (playerInv.hasItemStack(i.getId(), i.getAmount())) {
         playerInv.decreaseItemStackSize(i.getId(), i.getAmount());
+      } else {
+        // Message player that they don't have enough
       }
     }
   }
@@ -157,10 +159,10 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
     String name = item.toUpperCase();
 
-    String lore0 = String.format("Buy %dx %s", count, name);
+    String lore0 = String.format("%s %dx %s", action, count, name);
     String lore1 = String.format("Item: %s", name);
     String lore2 = String.format("Amount: %d", count);
-    String lore3 = String.format("Price: $???");
+    String lore3 = String.format("Price: $%.2f", price * count);
 
     i.setLore(lore0, lore1, lore2, lore3, "Click to purchase this item");
     inv.setSlot(slot, i);
