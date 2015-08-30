@@ -77,17 +77,22 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
     CanaryObjectFactory of = new CanaryObjectFactory();
     Inventory ci = of.newCustomStorageInventory(1);
+
     ci.setInventoryName("SHOP");
 
-    fillSlot(action, ci, it, item, 0, 1);
-    fillSlot(action, ci, it, item, 1, 2);
-    fillSlot(action, ci, it, item, 2, 4);
-    fillSlot(action, ci, it, item, 3, 8);
-    fillSlot(action, ci, it, item, 4, 16);
-    fillSlot(action, ci, it, item, 5, 24);
-    fillSlot(action, ci, it, item, 6, 32);
-    fillSlot(action, ci, it, item, 7, 48);
-    fillSlot(action, ci, it, item, 8, 64);
+    if (action.equals("Buy")) {
+      fillSlot(action, ci, it, item, 0, 1);
+      fillSlot(action, ci, it, item, 1, 2);
+      fillSlot(action, ci, it, item, 2, 4);
+      fillSlot(action, ci, it, item, 3, 8);
+      fillSlot(action, ci, it, item, 4, 16);
+      fillSlot(action, ci, it, item, 5, 24);
+      fillSlot(action, ci, it, item, 6, 32);
+      fillSlot(action, ci, it, item, 7, 48);
+      fillSlot(action, ci, it, item, 8, 64);
+    } else {
+      fillSlot(action, ci, it, item, 4, 1);
+    }
 
     me.openInventory(ci);
   }
@@ -105,18 +110,49 @@ public class ShopTest extends EZPlugin implements PluginListener {
     event.setCanceled();
 
     Item i = h.getItem();
-    CompoundTag tag = i.getMetaTag();
-    String shopType = tag.getString("shoptype");
+    if (i == null) {
+      return;
+    }
+
+    CompoundTag itemMeta = i.getMetaTag();
+
+    // Slot 4 is always populated, it can tell if we're BUY/SELL by using the
+    // metatag.
+    Item slotItem = inv.getSlot(4);
+    if (slotItem == null) {
+      return; // There wasn't an item in slot 4, which is weird.
+    }
+    CompoundTag shopMeta = slotItem.getMetaTag();
+    String shopType = shopMeta.getString("shoptype");
+    if (!shopType.equals("BUY") && !shopType.equals("SELL")) {
+      return; // The shoptype metatag was set to something weird.
+    }
 
     Inventory playerInv = me.getInventory();
 
     if (shopType.equals("BUY")) {
+      if (!itemMeta.containsKey("shoptype")) {
+        // Clicked item in own inventory, return
+        return;
+      }
+      // Buy the item
       playerInv.addItem(i.getId(), i.getAmount());
     } else {
+      if (itemMeta.containsKey("shoptype") || i.getId() != slotItem.getId()) {
+        // Clicked item in top row or item is wrong type, return
+        return;
+      }
+      // Sell the item
       if (playerInv.hasItemStack(i.getId(), i.getAmount())) {
         playerInv.decreaseItemStackSize(i.getId(), i.getAmount());
       }
     }
+
+    // If it's a SELL shop, clicking an item in your own inventory sells it.
+    // Clicking the top row item does nothing.
+
+    // If it's a BUY shop, clicking an item in your own inventory does nothing.
+    // Clicking the top row item buys it.
   }
 
   private void fillSlot(String action, Inventory inv, ItemType it, String item, int slot, int count) {
