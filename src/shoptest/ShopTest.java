@@ -82,15 +82,15 @@ public class ShopTest extends EZPlugin implements PluginListener {
 
     ci.setInventoryName("SHOP");
 
-    fillSlot(action, p, ci, it, item, 0, 1);
-    fillSlot(action, p, ci, it, item, 1, 2);
-    fillSlot(action, p, ci, it, item, 2, 4);
-    fillSlot(action, p, ci, it, item, 3, 8);
-    fillSlot(action, p, ci, it, item, 4, 16);
-    fillSlot(action, p, ci, it, item, 5, 24);
-    fillSlot(action, p, ci, it, item, 6, 32);
-    fillSlot(action, p, ci, it, item, 7, 48);
-    fillSlot(action, p, ci, it, item, 8, 64);
+    ci.setSlot(0, itemForSlot(it, action, p, 1));
+    ci.setSlot(1, itemForSlot(it, action, p, 2));
+    ci.setSlot(2, itemForSlot(it, action, p, 4));
+    ci.setSlot(3, itemForSlot(it, action, p, 8));
+    ci.setSlot(4, itemForSlot(it, action, p, 16));
+    ci.setSlot(5, itemForSlot(it, action, p, 24));
+    ci.setSlot(6, itemForSlot(it, action, p, 32));
+    ci.setSlot(7, itemForSlot(it, action, p, 48));
+    ci.setSlot(8, itemForSlot(it, action, p, 64));
 
     me.openInventory(ci);
   }
@@ -143,15 +143,14 @@ public class ShopTest extends EZPlugin implements PluginListener {
     }
   }
 
-  private void fillSlot(String action, double price, Inventory inv, ItemType it, String item, int slot, int count) {
-
+  private Item itemForSlot(ItemType it, String action, double price, int count) {
     ItemFactory itemf = Canary.factory().getItemFactory();
     Item i = itemf.newItem(it, 0, count);
     CompoundTag tag = i.getMetaTag();
     tag.put("shoptype", action.toUpperCase());
     tag.put("price", price);
 
-    String name = item.toUpperCase();
+    String name = i.getDisplayName();
 
     String lore0 = String.format("%s %dx %s", action, count, name);
     String lore1 = String.format("Item: %s", name);
@@ -159,6 +158,7 @@ public class ShopTest extends EZPlugin implements PluginListener {
     String lore3 = String.format("Price: $%.2f", price * count);
 
     i.setLore(lore0, lore1, lore2, lore3, "Click to purchase this item");
-    inv.setSlot(slot, i);
+
+    return i;
   }
 }
