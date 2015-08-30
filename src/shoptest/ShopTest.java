@@ -123,13 +123,7 @@ public class ShopTest extends EZPlugin implements PluginListener {
     }
 
 
-    // Get slot 0 item to tell if we're BUY/SELL by using the metatag.
-    Item slotItem = inv.getSlot(0);
-    if (slotItem == null) {
-      return; // There wasn't an item in slot 0, which is weird.
-    }
-    CompoundTag shopMeta = slotItem.getMetaTag();
-    String shopType = shopMeta.getString("shoptype");
+    String shopType = itemMeta.getString("shoptype");
     if (!shopType.equals("BUY") && !shopType.equals("SELL")) {
       return; // The shoptype metatag was set to something weird.
     }
@@ -167,5 +161,4 @@ public class ShopTest extends EZPlugin implements PluginListener {
     i.setLore(lore0, lore1, lore2, lore3, "Click to purchase this item");
     inv.setSlot(slot, i);
   }
-
 }
